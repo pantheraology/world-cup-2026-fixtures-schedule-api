@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calendarToIcs } from '../src/ics.js';
-import { buildCalendar, buildGroups, buildTeams, buildVenues, filterFixtures, normalizeDateTime, normalizeOpenFootball, scheduleHash } from '../src/worldcup.js';
+import { buildCalendar, buildDailySchedule, buildGroups, buildTeams, buildVenues, filterFixtures, markFixturesAsCached, normalizeDateTime, normalizeOpenFootball, scheduleHash } from '../src/worldcup.js';
 import type { RawOpenFootballWorldCup } from '../src/types.js';
 
 test('normalizes UTC offset kickoff to UTC and viewer timezone', () => {
@@ -28,6 +28,10 @@ test('builds fixture, group, venue, team, calendar records and stable hash', () 
   assert.equal(buildVenues(fixtures).length, 2);
   assert.equal(buildTeams(fixtures).some((team) => team.team === 'Belgium'), true);
   assert.equal(buildCalendar(fixtures)[0].uid, 'world-cup-2026-match-1@panthera.ai');
+  assert.equal(buildDailySchedule(fixtures)[0].recordType, 'dailySchedule');
+  assert.equal(buildDailySchedule(fixtures)[0].matchCount, 1);
+  assert.equal(markFixturesAsCached(fixtures, 'network down')[0].dataQuality, 'cached-public-domain-community');
+  assert.match(markFixturesAsCached(fixtures, 'network down')[0].notes.at(-1) ?? '', /network down/);
   assert.equal(filterFixtures(fixtures, { team: 'mex', city: 'mexico', sortBy: 'date' }).length, 1);
   assert.equal(filterFixtures(fixtures, { group: 'Group B' })[0].teamA, 'Canada');
   assert.equal(scheduleHash(fixtures).length, 64);

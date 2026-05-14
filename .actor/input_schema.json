@@ -18,8 +18,8 @@
       "description": "Choose which records to write to the default dataset.",
       "editor": "select",
       "default": "fixtures",
-      "enum": ["fixtures", "groups", "venues", "teams", "calendar", "all"],
-      "enumTitles": ["Fixtures", "Groups", "Venues", "Teams", "Calendar events", "All record types"]
+      "enum": ["fixtures", "groups", "venues", "teams", "calendar", "dailySchedule", "all"],
+      "enumTitles": ["Fixtures", "Groups", "Venues", "Teams", "Calendar events", "Daily schedule", "All record types"]
     },
     "timezone": {
       "title": "Viewer timezone",

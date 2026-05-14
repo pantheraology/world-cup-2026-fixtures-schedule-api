@@ -1,6 +1,6 @@
 export type ActorInput = {
   source?: 'openfootball';
-  outputMode?: 'fixtures' | 'groups' | 'venues' | 'teams' | 'calendar' | 'all';
+  outputMode?: 'fixtures' | 'groups' | 'venues' | 'teams' | 'calendar' | 'dailySchedule' | 'all';
   emitIcsCalendar?: boolean;
   timezone?: string;
   includeTbd?: boolean;
@@ -47,7 +47,7 @@ export type FixtureRecord = {
   stadium: string | null;
   source: string;
   sourceUrl: string;
-  dataQuality: 'official' | 'public-domain-community';
+  dataQuality: 'official' | 'public-domain-community' | 'cached-public-domain-community';
   notes: string[];
 };
 
@@ -60,6 +60,22 @@ export type CalendarRecord = {
   startsAtLocal: string | null;
   location: string | null;
   sourceUrl: string;
+};
+
+export type DailyScheduleRecord = {
+  recordType: 'dailySchedule';
+  date: string;
+  localDate: string | null;
+  matchCount: number;
+  matches: Array<{
+    matchNumber: number;
+    kickoffUtc: string | null;
+    kickoffLocal: string | null;
+    title: string;
+    group: string | null;
+    stage: string;
+    city: string | null;
+  }>;
 };
 
 export type GroupRecord = {

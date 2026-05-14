@@ -8,8 +8,9 @@ Apify Actor for normalized FIFA World Cup 2026 schedule data: fixtures, groups, 
 - Normalizes each fixture into API-friendly records.
 - Adds UTC kickoff (`isoUtc`) and viewer-local kickoff (`localTime`) using an IANA timezone input.
 - Filters by group, team, city, stage, and date range.
-- Emits derived datasets for groups, venues, teams, and calendar events.
-- Writes `calendar-events.json` and importable `world-cup-2026-fixtures.ics` to key-value store.
+- Emits derived datasets for groups, venues, teams, calendar events, and daily schedules.
+- Writes `calendar-events.json`, `daily-schedule.json`, and importable `world-cup-2026-fixtures.ics` to key-value store.
+- Caches the last successful OpenFootball source payload and falls back to it if a scheduled run hits a transient source/network failure.
 - Stores a schedule hash in key-value store so scheduled runs can detect changes.
 - Writes clean rows to the default Apify dataset for export as JSON, CSV, Excel, RSS, or API.
 
@@ -46,7 +47,7 @@ Developers building apps, widgets, dashboards, newsletters, fantasy tools, sport
 ### Fields
 
 - `source`: currently `openfootball`.
-- `outputMode`: `fixtures`, `groups`, `venues`, `teams`, `calendar`, or `all`.
+- `outputMode`: `fixtures`, `groups`, `venues`, `teams`, `calendar`, `dailySchedule`, or `all`.
 - `timezone`: IANA timezone used for `localTime`, e.g. `UTC`, `Europe/Zagreb`, `America/New_York`.
 - `group`: optional exact group filter, e.g. `Group A`.
 - `team`: optional partial team filter, e.g. `Mexico`, `USA`, `Winner Group A`.
@@ -98,6 +99,28 @@ Developers building apps, widgets, dashboards, newsletters, fantasy tools, sport
 }
 ```
 
+## Output example: daily schedule
+
+```json
+{
+  "recordType": "dailySchedule",
+  "date": "2026-06-11",
+  "localDate": "2026-06-11",
+  "matchCount": 1,
+  "matches": [
+    {
+      "matchNumber": 1,
+      "kickoffUtc": "2026-06-11T19:00:00Z",
+      "kickoffLocal": "2026-06-11T21:00:00+02:00",
+      "title": "Mexico vs South Africa",
+      "group": "Group A",
+      "stage": "Matchday 1",
+      "city": "Mexico City"
+    }
+  ]
+}
+```
+
 ## Key-value store OUTPUT
 
 Each run stores a compact summary in `OUTPUT`:
@@ -110,6 +133,7 @@ Each run stores a compact summary in `OUTPUT`:
   "venueCount": 16,
   "teamCount": 112,
   "calendarEventCount": 104,
+  "dailyScheduleDayCount": 104,
   "icsCalendarKey": "world-cup-2026-fixtures.ics",
   "scheduleHash": "...",
   "previousScheduleHash": "...",

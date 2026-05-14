@@ -1,7 +1,7 @@
 import { Actor, log } from 'apify';
 import { calendarToIcs } from './ics.js';
-import { buildCalendar, buildGroups, buildTeams, buildVenues, fetchOpenFootballWorldCup, filterFixtures, normalizeOpenFootball, scheduleHash } from './worldcup.js';
-import type { ActorInput } from './types.js';
+import { buildCalendar, buildDailySchedule, buildGroups, buildTeams, buildVenues, fetchOpenFootballWorldCup, filterFixtures, markFixturesAsCached, normalizeOpenFootball, scheduleHash } from './worldcup.js';
+import type { ActorInput, RawOpenFootballWorldCup } from './types.js';
 
 await Actor.init();
 
@@ -36,8 +36,25 @@ try {
     }
   });
 
-  const raw = await fetchOpenFootballWorldCup();
+  const kv = await Actor.openKeyValueStore();
+  let raw: RawOpenFootballWorldCup;
+  let sourceWasCached = false;
+  let sourceError: string | null = null;
+
+  try {
+    raw = await fetchOpenFootballWorldCup();
+    await kv.setValue('RAW_OPENFOOTBALL_CACHE', raw);
+  } catch (error) {
+    sourceError = error instanceof Error ? error.message : String(error);
+    const cached = await kv.getValue<RawOpenFootballWorldCup>('RAW_OPENFOOTBALL_CACHE');
+    if (!cached) throw error;
+    raw = cached;
+    sourceWasCached = true;
+    log.warning('Live source fetch failed; using cached OpenFootball payload', { sourceError });
+  }
+
   let fixtures = normalizeOpenFootball(raw, timezone);
+  if (sourceWasCached) fixtures = markFixturesAsCached(fixtures, sourceError ?? 'unknown error');
 
   if (!includeTbd) {
     fixtures = fixtures.filter((fixture) => !fixture.notes.some((note) => note.includes('placeholder')));
@@ -57,20 +74,23 @@ try {
   const venues = buildVenues(fixtures);
   const teams = buildTeams(fixtures);
   const calendar = buildCalendar(fixtures);
+  const dailySchedule = buildDailySchedule(fixtures);
   const currentHash = scheduleHash(fixtures);
 
-  const kv = await Actor.openKeyValueStore();
   const previousHash = await kv.getValue<string>('LAST_SCHEDULE_HASH');
   const summary = {
     actor: 'world-cup-2026-fixtures-schedule-api',
     source,
     sourceName: raw.name,
+    sourceWasCached,
+    sourceError,
     fetchedAt: new Date().toISOString(),
     fixtureCount: fixtures.length,
     groupCount: groups.length,
     venueCount: venues.length,
     teamCount: teams.length,
     calendarEventCount: calendar.length,
+    dailyScheduleDayCount: dailySchedule.length,
     icsCalendarKey: emitIcsCalendar ? 'world-cup-2026-fixtures.ics' : null,
     timezone,
     outputMode,
@@ -87,12 +107,13 @@ try {
     scheduleHash: currentHash,
     previousScheduleHash: previousHash ?? null,
     changedSincePreviousRun: previousHash ? previousHash !== currentHash : null,
-    dataQuality: 'public-domain-community',
+    dataQuality: sourceWasCached ? 'cached-public-domain-community' : 'public-domain-community',
     caveat: 'MVP uses OpenFootball public-domain community JSON. Use sourceUrl and notes fields when final draw/team assignments change.'
   };
 
   await kv.setValue('OUTPUT', summary);
   await kv.setValue('calendar-events.json', calendar);
+  await kv.setValue('daily-schedule.json', dailySchedule);
   if (emitIcsCalendar) {
     await kv.setValue('world-cup-2026-fixtures.ics', calendarToIcs(calendar), { contentType: 'text/calendar; charset=utf-8' });
   }
@@ -106,7 +127,8 @@ try {
   else if (outputMode === 'venues') records = venues;
   else if (outputMode === 'teams') records = teams;
   else if (outputMode === 'calendar') records = calendar;
-  else records = [summary, ...fixtures, ...calendar, ...groups, ...venues, ...teams];
+  else if (outputMode === 'dailySchedule') records = dailySchedule;
+  else records = [summary, ...fixtures, ...calendar, ...dailySchedule, ...groups, ...venues, ...teams];
 
   if (maxItems > 0) records = records.slice(0, maxItems);
 

@@ -1,0 +1,4 @@
+recordType,date,localDate,matchCount,matches
+dailySchedule,2026-06-11,2026-06-11,1,"[{""matchNumber"": 1, ""kickoffUtc"": ""2026-06-11T19:00:00Z"", ""kickoffLocal"": ""2026-06-11T21:00:00+02:00"", ""title"": ""Mexico vs South Africa"", ""group"": ""Group A"", ""stage"": ""Matchday 1"", ""city"": ""Mexico City""}]"
+dailySchedule,2026-06-19,2026-06-19,1,"[{""matchNumber"": 4, ""kickoffUtc"": ""2026-06-19T01:00:00Z"", ""kickoffLocal"": ""2026-06-19T03:00:00+02:00"", ""title"": ""Mexico vs South Korea"", ""group"": ""Group A"", ""stage"": ""Matchday 8"", ""city"": ""Guadalajara (Zapopan)""}]"
+dailySchedule,2026-06-25,2026-06-25,1,"[{""matchNumber"": 5, ""kickoffUtc"": ""2026-06-25T01:00:00Z"", ""kickoffLocal"": ""2026-06-25T03:00:00+02:00"", ""title"": ""Czech Republic vs Mexico"", ""group"": ""Group A"", ""stage"": ""Matchday 14"", ""city"": ""Mexico City""}]"

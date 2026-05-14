@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { DateTime, FixedOffsetZone } from 'luxon';
-import type { CalendarRecord, FixtureRecord, GroupRecord, RawOpenFootballMatch, RawOpenFootballWorldCup, TeamRecord, VenueRecord } from './types.js';
+import type { CalendarRecord, DailyScheduleRecord, FixtureRecord, GroupRecord, RawOpenFootballMatch, RawOpenFootballWorldCup, TeamRecord, VenueRecord } from './types.js';
 
 export const OPENFOOTBALL_2026_URL = 'https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json';
 
@@ -213,6 +213,40 @@ export function filterFixtures(fixtures: FixtureRecord[], filters: {
   }
 
   return filtered;
+}
+
+export function markFixturesAsCached(fixtures: FixtureRecord[], reason: string): FixtureRecord[] {
+  return fixtures.map((fixture) => ({
+    ...fixture,
+    dataQuality: 'cached-public-domain-community',
+    notes: [...fixture.notes, `Served from cached source data because live fetch failed: ${reason}`]
+  }));
+}
+
+export function buildDailySchedule(fixtures: FixtureRecord[]): DailyScheduleRecord[] {
+  const days = new Map<string, DailyScheduleRecord['matches']>();
+  for (const fixture of fixtures) {
+    const key = fixture.localTime?.slice(0, 10) || fixture.date;
+    const matches = days.get(key) ?? [];
+    matches.push({
+      matchNumber: fixture.matchNumber,
+      kickoffUtc: fixture.isoUtc,
+      kickoffLocal: fixture.localTime,
+      title: `${fixture.teamA} vs ${fixture.teamB}`,
+      group: fixture.group,
+      stage: fixture.stage,
+      city: fixture.city
+    });
+    days.set(key, matches);
+  }
+
+  return [...days.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, matches]) => ({
+    recordType: 'dailySchedule',
+    date,
+    localDate: date,
+    matchCount: matches.length,
+    matches: matches.sort((a, b) => (a.kickoffUtc ?? '').localeCompare(b.kickoffUtc ?? '') || a.matchNumber - b.matchNumber)
+  }));
 }
 
 export function scheduleHash(fixtures: FixtureRecord[]): string {
