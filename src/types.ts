@@ -1,6 +1,7 @@
 export type ActorInput = {
   source?: 'openfootball';
   outputMode?: 'fixtures' | 'groups' | 'venues' | 'teams' | 'calendar' | 'all';
+  emitIcsCalendar?: boolean;
   timezone?: string;
   includeTbd?: boolean;
   emitChangeSummary?: boolean;

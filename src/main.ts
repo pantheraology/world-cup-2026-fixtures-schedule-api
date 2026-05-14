@@ -1,4 +1,5 @@
 import { Actor, log } from 'apify';
+import { calendarToIcs } from './ics.js';
 import { buildCalendar, buildGroups, buildTeams, buildVenues, fetchOpenFootballWorldCup, filterFixtures, normalizeOpenFootball, scheduleHash } from './worldcup.js';
 import type { ActorInput } from './types.js';
 
@@ -11,6 +12,7 @@ try {
   const timezone = input.timezone ?? 'UTC';
   const includeTbd = input.includeTbd ?? true;
   const emitChangeSummary = input.emitChangeSummary ?? true;
+  const emitIcsCalendar = input.emitIcsCalendar ?? true;
   const maxItems = Math.max(0, input.maxItems ?? 0);
   const sortBy = input.sortBy ?? 'matchNumber';
 
@@ -69,6 +71,7 @@ try {
     venueCount: venues.length,
     teamCount: teams.length,
     calendarEventCount: calendar.length,
+    icsCalendarKey: emitIcsCalendar ? 'world-cup-2026-fixtures.ics' : null,
     timezone,
     outputMode,
     filters: {
@@ -89,6 +92,10 @@ try {
   };
 
   await kv.setValue('OUTPUT', summary);
+  await kv.setValue('calendar-events.json', calendar);
+  if (emitIcsCalendar) {
+    await kv.setValue('world-cup-2026-fixtures.ics', calendarToIcs(calendar), { contentType: 'text/calendar; charset=utf-8' });
+  }
   if (emitChangeSummary) {
     await kv.setValue('LAST_SCHEDULE_HASH', currentHash);
   }

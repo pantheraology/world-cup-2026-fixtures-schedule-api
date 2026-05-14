@@ -80,6 +80,13 @@
       "editor": "checkbox",
       "default": true
     },
+    "emitIcsCalendar": {
+      "title": "Emit iCalendar file",
+      "type": "boolean",
+      "description": "Write a world-cup-2026-fixtures.ics file to the key-value store for calendar imports/subscriptions.",
+      "editor": "checkbox",
+      "default": true
+    },
     "emitChangeSummary": {
       "title": "Emit schedule change summary",
       "type": "boolean",

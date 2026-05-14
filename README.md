@@ -9,6 +9,7 @@ Apify Actor for normalized FIFA World Cup 2026 schedule data: fixtures, groups, 
 - Adds UTC kickoff (`isoUtc`) and viewer-local kickoff (`localTime`) using an IANA timezone input.
 - Filters by group, team, city, stage, and date range.
 - Emits derived datasets for groups, venues, teams, and calendar events.
+- Writes `calendar-events.json` and importable `world-cup-2026-fixtures.ics` to key-value store.
 - Stores a schedule hash in key-value store so scheduled runs can detect changes.
 - Writes clean rows to the default Apify dataset for export as JSON, CSV, Excel, RSS, or API.
 
@@ -54,6 +55,7 @@ Developers building apps, widgets, dashboards, newsletters, fantasy tools, sport
 - `fromDate` / `toDate`: optional inclusive `YYYY-MM-DD` date range.
 - `sortBy`: `matchNumber` or `date`.
 - `includeTbd`: keep TBD/placeholders. Useful before final assignments are official.
+- `emitIcsCalendar`: write an importable `.ics` calendar file to key-value store.
 - `emitChangeSummary`: save `LAST_SCHEDULE_HASH` and `OUTPUT` in key-value store.
 - `maxItems`: optional row cap for test runs. `0` means unlimited.
 
@@ -108,6 +110,7 @@ Each run stores a compact summary in `OUTPUT`:
   "venueCount": 16,
   "teamCount": 112,
   "calendarEventCount": 104,
+  "icsCalendarKey": "world-cup-2026-fixtures.ics",
   "scheduleHash": "...",
   "previousScheduleHash": "...",
   "changedSincePreviousRun": false
