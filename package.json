@@ -1,0 +1,26 @@
+{
+  "name": "world-cup-2026-fixtures-schedule-api",
+  "version": "0.1.0",
+  "description": "Apify Actor that returns normalized FIFA World Cup 2026 fixtures, groups, venues, and schedule change hashes from public sources.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/main.js",
+    "dev": "tsx src/main.ts",
+    "test": "node --test dist/tests/*.test.js",
+    "pretest": "npm run build"
+  },
+  "dependencies": {
+    "apify": "^3.7.2",
+    "luxon": "^3.7.2"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.7.1",
+    "@types/node": "^22.15.29",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

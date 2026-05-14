@@ -1,0 +1,55 @@
+{
+  "title": "World Cup 2026 Fixtures & Schedule API Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "source": {
+      "title": "Data source",
+      "type": "string",
+      "description": "Public data source to read. OpenFootball is public-domain JSON and currently the safest no-login MVP source.",
+      "editor": "select",
+      "default": "openfootball",
+      "enum": ["openfootball"],
+      "enumTitles": ["OpenFootball public-domain JSON"]
+    },
+    "outputMode": {
+      "title": "Output mode",
+      "type": "string",
+      "description": "Choose which records to write to the default dataset.",
+      "editor": "select",
+      "default": "fixtures",
+      "enum": ["fixtures", "groups", "venues", "teams", "all"],
+      "enumTitles": ["Fixtures", "Groups", "Venues", "Teams", "All record types"]
+    },
+    "timezone": {
+      "title": "Viewer timezone",
+      "type": "string",
+      "description": "IANA timezone used to add a localTime field, e.g. UTC, Europe/Zagreb, America/New_York.",
+      "editor": "textfield",
+      "default": "UTC"
+    },
+    "includeTbd": {
+      "title": "Include TBD/placeholders",
+      "type": "boolean",
+      "description": "Keep fixtures where one or both teams are TBD/placeholders. Useful before final draw/qualification is complete.",
+      "editor": "checkbox",
+      "default": true
+    },
+    "emitChangeSummary": {
+      "title": "Emit schedule change summary",
+      "type": "boolean",
+      "description": "Compare current fixture hash to previous run and write a summary object to key-value store OUTPUT.",
+      "editor": "checkbox",
+      "default": true
+    },
+    "maxItems": {
+      "title": "Maximum dataset rows",
+      "type": "integer",
+      "description": "Optional cap for quick test runs. 0 means no cap.",
+      "editor": "number",
+      "default": 0,
+      "minimum": 0
+    }
+  },
+  "required": ["source", "outputMode", "timezone"]
+}

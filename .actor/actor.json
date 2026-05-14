@@ -1,0 +1,39 @@
+{
+  "actorSpecification": 1,
+  "name": "world-cup-2026-fixtures-schedule-api",
+  "title": "World Cup 2026 Fixtures & Schedule API",
+  "description": "Normalized FIFA World Cup 2026 schedule, fixtures, groups, venues, teams, timezone conversion, and change detection from public sources.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "input": "./input_schema.json",
+  "readme": "../README.md",
+  "dockerfile": "../Dockerfile",
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "title": "World Cup 2026 fixture records",
+      "views": {
+        "overview": {
+          "title": "Overview",
+          "transformation": {
+            "fields": ["matchNumber", "stage", "group", "date", "time", "timezone", "isoUtc", "localTime", "teamA", "teamB", "city", "stadium", "sourceUrl"]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "matchNumber": { "label": "#", "format": "number" },
+              "stage": { "label": "Stage" },
+              "group": { "label": "Group" },
+              "isoUtc": { "label": "UTC kickoff" },
+              "localTime": { "label": "Local kickoff" },
+              "teamA": { "label": "Team A" },
+              "teamB": { "label": "Team B" },
+              "city": { "label": "City" },
+              "stadium": { "label": "Stadium" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
