@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { DateTime, FixedOffsetZone } from 'luxon';
-import type { FixtureRecord, GroupRecord, RawOpenFootballMatch, RawOpenFootballWorldCup, TeamRecord, VenueRecord } from './types.js';
+import type { CalendarRecord, FixtureRecord, GroupRecord, RawOpenFootballMatch, RawOpenFootballWorldCup, TeamRecord, VenueRecord } from './types.js';
 
 export const OPENFOOTBALL_2026_URL = 'https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json';
 
@@ -166,6 +166,53 @@ export function buildTeams(fixtures: FixtureRecord[]): TeamRecord[] {
     group: value.group,
     fixtureCount: value.fixtureCount
   }));
+}
+
+export function buildCalendar(fixtures: FixtureRecord[]): CalendarRecord[] {
+  return fixtures.map((fixture) => ({
+    recordType: 'calendar',
+    uid: `world-cup-2026-match-${fixture.matchNumber}@panthera.ai`,
+    title: `${fixture.teamA} vs ${fixture.teamB}`,
+    description: [fixture.stage, fixture.group, `Match ${fixture.matchNumber}`].filter(Boolean).join(' | '),
+    startsAtUtc: fixture.isoUtc,
+    startsAtLocal: fixture.localTime,
+    location: fixture.city,
+    sourceUrl: fixture.sourceUrl
+  }));
+}
+
+export function filterFixtures(fixtures: FixtureRecord[], filters: {
+  group?: string;
+  team?: string;
+  city?: string;
+  stage?: string;
+  fromDate?: string;
+  toDate?: string;
+  sortBy?: 'matchNumber' | 'date';
+}): FixtureRecord[] {
+  const needle = (value?: string) => value?.trim().toLowerCase();
+  const group = needle(filters.group);
+  const team = needle(filters.team);
+  const city = needle(filters.city);
+  const stage = needle(filters.stage);
+
+  const filtered = fixtures.filter((fixture) => {
+    if (group && fixture.group?.toLowerCase() !== group) return false;
+    if (team && ![fixture.teamA, fixture.teamB].some((candidate) => candidate.toLowerCase().includes(team))) return false;
+    if (city && !fixture.city?.toLowerCase().includes(city)) return false;
+    if (stage && !fixture.stage.toLowerCase().includes(stage)) return false;
+    if (filters.fromDate && fixture.date < filters.fromDate) return false;
+    if (filters.toDate && fixture.date > filters.toDate) return false;
+    return true;
+  });
+
+  if (filters.sortBy === 'date') {
+    filtered.sort((a, b) => (a.isoUtc ?? a.date).localeCompare(b.isoUtc ?? b.date) || a.matchNumber - b.matchNumber);
+  } else {
+    filtered.sort((a, b) => a.matchNumber - b.matchNumber);
+  }
+
+  return filtered;
 }
 
 export function scheduleHash(fixtures: FixtureRecord[]): string {

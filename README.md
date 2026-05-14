@@ -1,19 +1,28 @@
 # World Cup 2026 Fixtures & Schedule API Actor
 
-Apify Actor for normalized FIFA World Cup 2026 schedule data: fixtures, groups, teams, venues, timezone conversion, and schedule-change hashes.
+Apify Actor for normalized FIFA World Cup 2026 schedule data: fixtures, groups, teams, venues, calendar-event rows, timezone conversion, filters, and schedule-change hashes.
 
 ## What it does
 
 - Fetches public-domain World Cup 2026 JSON from [`openfootball/worldcup.json`](https://github.com/openfootball/worldcup.json).
 - Normalizes each fixture into API-friendly records.
 - Adds UTC kickoff (`isoUtc`) and viewer-local kickoff (`localTime`) using an IANA timezone input.
-- Emits derived datasets for groups, venues, and teams.
+- Filters by group, team, city, stage, and date range.
+- Emits derived datasets for groups, venues, teams, and calendar events.
 - Stores a schedule hash in key-value store so scheduled runs can detect changes.
 - Writes clean rows to the default Apify dataset for export as JSON, CSV, Excel, RSS, or API.
 
 ## Why this exists
 
-Developers building apps, widgets, dashboards, newsletters, fantasy tools, sports-media workflows, and research notebooks need a simple export-first source for the 2026 World Cup schedule. Big sports APIs are overkill for schedule-only use cases; this Actor is the lightweight plug-in version.
+Developers building apps, widgets, dashboards, newsletters, fantasy tools, sports-media workflows, betting/research notebooks, and calendar integrations need a simple export-first source for the 2026 World Cup schedule. Big sports APIs are overkill for schedule-only use cases; this Actor is the lightweight plug-in version.
+
+## High-value use cases
+
+- “Show me all Mexico / USA / Canada fixtures in my timezone.”
+- “Export Group A matches to CSV.”
+- “Generate calendar-event rows for every match.”
+- “Monitor schedule changes once FIFA updates fixtures/team assignments.”
+- “Power a static website or app with a clean World Cup fixture API.”
 
 ## Input
 
@@ -22,6 +31,11 @@ Developers building apps, widgets, dashboards, newsletters, fantasy tools, sport
   "source": "openfootball",
   "outputMode": "fixtures",
   "timezone": "Europe/Zagreb",
+  "team": "Mexico",
+  "city": "Mexico City",
+  "fromDate": "2026-06-01",
+  "toDate": "2026-07-31",
+  "sortBy": "date",
   "includeTbd": true,
   "emitChangeSummary": true,
   "maxItems": 0
@@ -31,13 +45,19 @@ Developers building apps, widgets, dashboards, newsletters, fantasy tools, sport
 ### Fields
 
 - `source`: currently `openfootball`.
-- `outputMode`: `fixtures`, `groups`, `venues`, `teams`, or `all`.
+- `outputMode`: `fixtures`, `groups`, `venues`, `teams`, `calendar`, or `all`.
 - `timezone`: IANA timezone used for `localTime`, e.g. `UTC`, `Europe/Zagreb`, `America/New_York`.
+- `group`: optional exact group filter, e.g. `Group A`.
+- `team`: optional partial team filter, e.g. `Mexico`, `USA`, `Winner Group A`.
+- `city`: optional partial host city filter, e.g. `Toronto`, `Atlanta`, `Mexico City`.
+- `stage`: optional partial stage filter, e.g. `Matchday 1`, `Round of 32`, `Final`.
+- `fromDate` / `toDate`: optional inclusive `YYYY-MM-DD` date range.
+- `sortBy`: `matchNumber` or `date`.
 - `includeTbd`: keep TBD/placeholders. Useful before final assignments are official.
 - `emitChangeSummary`: save `LAST_SCHEDULE_HASH` and `OUTPUT` in key-value store.
 - `maxItems`: optional row cap for test runs. `0` means unlimited.
 
-## Output example
+## Output example: fixture
 
 ```json
 {
@@ -61,6 +81,21 @@ Developers building apps, widgets, dashboards, newsletters, fantasy tools, sport
 }
 ```
 
+## Output example: calendar
+
+```json
+{
+  "recordType": "calendar",
+  "uid": "world-cup-2026-match-1@panthera.ai",
+  "title": "Mexico vs South Africa",
+  "description": "Matchday 1 | Group A | Match 1",
+  "startsAtUtc": "2026-06-11T19:00:00Z",
+  "startsAtLocal": "2026-06-11T21:00:00+02:00",
+  "location": "Mexico City",
+  "sourceUrl": "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json"
+}
+```
+
 ## Key-value store OUTPUT
 
 Each run stores a compact summary in `OUTPUT`:
@@ -71,7 +106,8 @@ Each run stores a compact summary in `OUTPUT`:
   "fixtureCount": 104,
   "groupCount": 12,
   "venueCount": 16,
-  "teamCount": 48,
+  "teamCount": 112,
+  "calendarEventCount": 104,
   "scheduleHash": "...",
   "previousScheduleHash": "...",
   "changedSincePreviousRun": false
@@ -86,7 +122,7 @@ The MVP source is OpenFootball public-domain community JSON. That is perfect for
 
 Start as pay-per-result:
 
-- `$1.00 / 1,000 dataset rows` for fixtures/groups/venues/teams.
+- `$1.00 / 1,000 dataset rows` for fixtures/groups/venues/teams/calendar rows.
 - Later add a higher-value scheduled monitor mode: `$0.25-$0.50/run` for change detection alerts.
 
 ## Local development
@@ -107,6 +143,8 @@ cat > storage/key_value_stores/default/INPUT.json <<'JSON'
   "source": "openfootball",
   "outputMode": "fixtures",
   "timezone": "Europe/Zagreb",
+  "team": "Mexico",
+  "sortBy": "date",
   "includeTbd": true,
   "emitChangeSummary": true,
   "maxItems": 5

@@ -1,0 +1,4 @@
+recordType,matchNumber,stage,group,date,time,timezone,isoUtc,localTime,teamA,teamB,city,sourceUrl
+fixture,1,Matchday 1,Group A,2026-06-11,13:00,UTC-6,2026-06-11T19:00:00Z,2026-06-11T21:00:00+02:00,Mexico,South Africa,Mexico City,https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json
+fixture,4,Matchday 8,Group A,2026-06-18,19:00,UTC-6,2026-06-19T01:00:00Z,2026-06-19T03:00:00+02:00,Mexico,South Korea,Guadalajara (Zapopan),https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json
+fixture,5,Matchday 14,Group A,2026-06-24,19:00,UTC-6,2026-06-25T01:00:00Z,2026-06-25T03:00:00+02:00,Czech Republic,Mexico,Mexico City,https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json

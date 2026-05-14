@@ -16,7 +16,7 @@
         "overview": {
           "title": "Overview",
           "transformation": {
-            "fields": ["matchNumber", "stage", "group", "date", "time", "timezone", "isoUtc", "localTime", "teamA", "teamB", "city", "stadium", "sourceUrl"]
+            "fields": ["recordType", "matchNumber", "stage", "group", "date", "time", "timezone", "isoUtc", "localTime", "teamA", "teamB", "city", "stadium", "sourceUrl"]
           },
           "display": {
             "component": "table",

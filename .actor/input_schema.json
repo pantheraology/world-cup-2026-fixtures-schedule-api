@@ -6,7 +6,7 @@
     "source": {
       "title": "Data source",
       "type": "string",
-      "description": "Public data source to read. OpenFootball is public-domain JSON and currently the safest no-login MVP source.",
+      "description": "Public data source to read. OpenFootball is public-domain JSON and currently the safest no-login source.",
       "editor": "select",
       "default": "openfootball",
       "enum": ["openfootball"],
@@ -18,8 +18,8 @@
       "description": "Choose which records to write to the default dataset.",
       "editor": "select",
       "default": "fixtures",
-      "enum": ["fixtures", "groups", "venues", "teams", "all"],
-      "enumTitles": ["Fixtures", "Groups", "Venues", "Teams", "All record types"]
+      "enum": ["fixtures", "groups", "venues", "teams", "calendar", "all"],
+      "enumTitles": ["Fixtures", "Groups", "Venues", "Teams", "Calendar events", "All record types"]
     },
     "timezone": {
       "title": "Viewer timezone",
@@ -27,6 +27,51 @@
       "description": "IANA timezone used to add a localTime field, e.g. UTC, Europe/Zagreb, America/New_York.",
       "editor": "textfield",
       "default": "UTC"
+    },
+    "group": {
+      "title": "Group filter",
+      "type": "string",
+      "description": "Optional exact group filter, e.g. Group A.",
+      "editor": "textfield"
+    },
+    "team": {
+      "title": "Team filter",
+      "type": "string",
+      "description": "Optional partial team filter, e.g. Mexico, USA, Winner Group A.",
+      "editor": "textfield"
+    },
+    "city": {
+      "title": "City filter",
+      "type": "string",
+      "description": "Optional partial host city filter, e.g. Toronto, Mexico City, Atlanta.",
+      "editor": "textfield"
+    },
+    "stage": {
+      "title": "Stage filter",
+      "type": "string",
+      "description": "Optional partial stage/round filter, e.g. Matchday 1, Round of 32, Final.",
+      "editor": "textfield"
+    },
+    "fromDate": {
+      "title": "From date",
+      "type": "string",
+      "description": "Optional inclusive start date in YYYY-MM-DD format.",
+      "editor": "datepicker"
+    },
+    "toDate": {
+      "title": "To date",
+      "type": "string",
+      "description": "Optional inclusive end date in YYYY-MM-DD format.",
+      "editor": "datepicker"
+    },
+    "sortBy": {
+      "title": "Sort by",
+      "type": "string",
+      "description": "Sort dataset rows by match number or kickoff datetime.",
+      "editor": "select",
+      "default": "matchNumber",
+      "enum": ["matchNumber", "date"],
+      "enumTitles": ["Match number", "Kickoff date/time"]
     },
     "includeTbd": {
       "title": "Include TBD/placeholders",
